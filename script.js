@@ -7,7 +7,7 @@ const levelData = {
         description: "Introduction and foundational Structural Drafting learning materials.",
         moduleTitle: "Drafting Fundamentals",
         moduleSummary: "Build foundational knowledge of structural drawings, drafting tools, and line conventions.",
-        moduleUrl: "module/2026/level%201/lesson.html",
+        moduleUrl: "modules/level-1.html",
         lessons: [
             "Introduction to Structural Drafting",
             "Drafting Tools and Materials",
@@ -22,7 +22,7 @@ const levelData = {
         description: "Developing knowledge and understanding of Structural Drafting concepts.",
         moduleTitle: "Drafting Standards and Geometry",
         moduleSummary: "Learn technical lettering, symbols, measurement, scale, and geometric construction.",
-        moduleUrl: "module/2026/level%202/lesson.html",
+        moduleUrl: "modules/level-2.html",
         lessons: [
             "Drafting Lettering and Symbols",
             "Measurement and Scale",
@@ -37,7 +37,7 @@ const levelData = {
         description: "Intermediate Structural Drafting concepts and guided learning.",
         moduleTitle: "Dimensions and Structural Drawings",
         moduleSummary: "Practice reading dimensions, floor plans, and the structural elements shown in drawings.",
-        moduleUrl: "module/2026/level%203/lesson.html",
+        moduleUrl: "modules/level-3.html",
         lessons: [
             "Basic Dimensioning",
             "Reading Simple Structural Drawings",
@@ -52,14 +52,15 @@ const levelData = {
         title: "APPLIED DRAFTING",
         description: "Applied Structural Drafting with a floor-plan drawing project.",
         moduleTitle: "Creating a Floor Plan Using StructDraft",
+        
         moduleSummary: "Follow the floor-plan workflow, then apply it to the timed drawing project.",
-        moduleUrl: "module/2026/level%204/lesson.html",
+        moduleUrl: "modules/level-4.html",
         lessons: [
             "Creating a Floor Plan Using StructDraft"
         ],
         drawingTitle: "Floor Plan Drafting Project",
         drawingDescription: "Complete the floor plan shown in the project reference. Furnishings are not required.",
-        projectReference: "module/2026/level%204/project-reference.png",
+        projectReference: "modules/level-4-project.png",
         hasQuiz: false,
         drawing: true
     },
@@ -69,13 +70,13 @@ const levelData = {
         description: "Advanced Structural Drafting with a foundation-plan drawing project.",
         moduleTitle: "Creating a Foundation Plan Using AutoCAD / StructDraft",
         moduleSummary: "Follow the foundation-plan workflow for footings, columns, dimensions, and labels.",
-        moduleUrl: "module/2026/level%205/lesson.html",
+        moduleUrl: "modules/level-5.html",
         lessons: [
             "Creating a Foundation Plan Using AutoCAD / StructDraft"
         ],
         drawingTitle: "Foundation Plan Drafting Project",
         drawingDescription: "Create the foundation plan shown in the project reference, including its structural layout and labels.",
-        projectReference: "module/2026/level%205/project-reference.png",
+        projectReference: "modules/level-5-project.png",
         hasQuiz: false,
         drawing: true
     }
