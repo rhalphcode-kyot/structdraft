@@ -632,7 +632,7 @@ function modulePreview(number) {
             <div class="module-reader">
                 <div class="module-reader-header">
                     <h3>LESSONS IN THIS MODULE</h3>
-                    <a class="btn secondary" href="${data.moduleUrl}" target="_blank" rel="noopener">OPEN FULL PAGE ↗</a>
+                    <button class="btn secondary" id="moduleFullscreenButton" onclick="toggleModuleFullscreen()">FULL SCREEN</button>
                 </div>
                 <ol class="module-lessons">
                     ${data.lessons.map((lesson) => `<li>${lesson}</li>`).join("")}
@@ -644,6 +644,26 @@ function modulePreview(number) {
 
     `;
 
+}
+
+async function toggleModuleFullscreen() {
+    const reader = document.querySelector('.module-reader');
+    if (!reader) return;
+
+    try {
+        if (document.fullscreenElement === reader) {
+            await document.exitFullscreen();
+        } else if (reader.requestFullscreen) {
+            await reader.requestFullscreen();
+        } else {
+            const isFullscreen = reader.classList.toggle('is-fullscreen');
+            const button = document.getElementById('moduleFullscreenButton');
+            if (button) button.textContent = isFullscreen ? 'EXIT FULL SCREEN' : 'FULL SCREEN';
+        }
+    } catch (error) {
+        console.error('Unable to toggle module fullscreen.', error);
+        alert('Fullscreen could not be changed. You can still read the module on this page.');
+    }
 }
 
 
@@ -2120,6 +2140,12 @@ document.addEventListener('keydown', handleDrawingKeyboardShortcut);
 document.addEventListener('fullscreenchange', () => {
     const button = document.getElementById('drawingFullscreenButton');
     if (button) button.textContent = document.fullscreenElement ? 'EXIT FULL SCREEN' : 'FULL SCREEN';
+
+    const moduleButton = document.getElementById('moduleFullscreenButton');
+    const moduleReader = document.querySelector('.module-reader');
+    if (moduleButton) {
+        moduleButton.textContent = document.fullscreenElement === moduleReader ? 'EXIT FULL SCREEN' : 'FULL SCREEN';
+    }
 });
 
 function deleteSelectedArea() {
@@ -3056,6 +3082,7 @@ function drawingPreview(number) {
             </details>
 
             <div class="drawing-toolbar">
+                <div class="drawing-toolbar-row drawing-toolbar-primary">
                 <button class="tool-btn drawing-tool-btn" id="toolPointer" onclick="setDrawingTool('pointer')" title="Pointer"><span class="tool-symbol">↖</span><small>POINTER</small></button>
                 <button class="tool-btn" id="toolSelect" onclick="setDrawingTool('select')" title="Crossing selection; press Delete to erase the selected area">CROSSING SELECT</button>
                 <button class="tool-btn drawing-tool-btn" id="toolLine" onclick="setDrawingTool('line')" title="Line; snaps to endpoints, intersections, and existing lines"><span class="tool-symbol">—</span><small>LINE</small></button>
@@ -3080,6 +3107,8 @@ function drawingPreview(number) {
                     </div>
                     <span class="dimension-help">Drag for direction, or click a start point and enter exact dimensions.</span>
                 </div>
+                </div>
+                <div class="drawing-toolbar-row drawing-toolbar-settings">
                 <div class="tool-group"><span class="group-title">TRACKING / SNAP</span><div class="tool-palette">
                     <button class="tool-btn" id="orthoToggle" onclick="toggleOrtho()" title="Ortho mode">ORTHO</button>
                     <button class="tool-btn" id="polarToggle" onclick="toggleDrawingMode('polar')" title="Polar tracking">POLAR</button>
@@ -3104,6 +3133,7 @@ function drawingPreview(number) {
                 <button class="tool-btn" id="drawingFullscreenButton" onclick="toggleDrawingFullscreen()" title="Expand drawing workspace">FULL SCREEN</button>
                 <span id="drawingSaveStatus" role="status">Draft saved locally</span>
                 <button class="tool-btn" onclick="submitDrawing(${number})" title="Submit">✓ SUBMIT</button>
+                </div>
             </div>
 
             <div class="drawing-container">
@@ -3138,20 +3168,27 @@ function drawingPreview(number) {
 
         <style>
             .drawing-toolbar {
-                display: flex;
-                gap: 3px;
-                padding: 6px;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                padding: 4px 8px;
                 background: rgba(255,255,255,0.05);
                 border-radius: 4px;
                 margin-bottom: 15px;
-                flex-wrap: nowrap;
-                align-items: center;
                 width: 100%;
                 max-width: 100%;
-                overflow-x: auto;
-                overflow-y: hidden;
-                scrollbar-width: thin;
-                scrollbar-color: rgba(170,181,193,0.55) rgba(7,26,48,0.5);
+            }
+
+            .drawing-toolbar-row {
+                display: flex;
+                min-width: 0;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 4px;
+                padding: 5px 0;
+            }
+
+            .drawing-toolbar-settings {
+                border-top: 1px solid rgba(255,255,255,0.12);
             }
 
             .drawing-measurement { position: absolute; z-index: 1; padding: 4px 7px; border: 1px solid #aab5c1; border-radius: 3px; background: #071a30; color: #eef2f7; font: 11px "Segoe UI", sans-serif; white-space: nowrap; pointer-events: none; }
@@ -3169,7 +3206,7 @@ function drawingPreview(number) {
                 white-space: nowrap;
             }
 
-            .drawing-toolbar > * { flex: 0 0 auto; }
+            .drawing-toolbar-row > * { flex: 0 0 auto; }
             .drawing-tool-btn { min-width: 54px; min-height: 42px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 3px 5px; }
             .drawing-tool-btn .tool-symbol { font-size: 17px; line-height: 1.1; }
             .drawing-tool-btn small { font-size: 8px; line-height: 1.2; white-space: nowrap; }
@@ -3196,17 +3233,17 @@ function drawingPreview(number) {
                 background: rgba(255,100,100,0.4);
             }
 
-            .tool-group { display: flex; flex: 0 0 auto; flex-direction: column; justify-content: center; gap: 4px; padding: 3px 6px; border-left: 1px solid rgba(255,255,255,0.12); }
+            .tool-group { display: flex; flex: 0 0 auto; flex-direction: column; justify-content: center; gap: 4px; max-width: 100%; min-width: 0; padding: 3px 6px; border-left: 1px solid rgba(255,255,255,0.12); }
             .tool-group[hidden] { display: none; }
             .drawing-context-tools { border-left: 1px solid rgba(255,255,255,0.12); border-top: 0; padding-top: 3px; }
             .group-title { color: #8d99ad; font-size: 8px; letter-spacing: 1.2px; }
-            .palette-categories { display: flex; flex-wrap: nowrap; gap: 4px; }
+            .palette-categories { display: flex; flex-wrap: wrap; gap: 4px; }
             .palette-category { flex: 0 0 auto; min-width: 0; padding: 3px 4px; border: 1px solid rgba(255,255,255,0.1); background: rgba(7,26,48,0.32); }
             .palette-category-title { display: block; margin-bottom: 3px; color: #8d99ad; font-size: 7px; font-weight: bold; letter-spacing: 1px; }
-            .palette-items { display: flex; flex-wrap: nowrap; gap: 3px; }
+            .palette-items { display: flex; flex-wrap: wrap; gap: 3px; }
             .tool-group select { min-height: 30px; background: #102a46; border: 1px solid #aab5c1; color: #eef2f7; }
             #annotationScaleLabel { color: #dfe7ff; font-size: 10px; }
-            .material-controls { display: flex; gap: 5px; align-items: center; flex-wrap: nowrap; }
+            .material-controls { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; max-width: 100%; }
             .material-controls label { color: #dfe7ff; font-size: 9px; }
             .material-controls input[type="number"] { width: 48px; background: #102a46; border: 1px solid #aab5c1; color: #eef2f7; }
             .material-controls input[type="number"] { padding: 5px; }
@@ -3238,7 +3275,7 @@ function drawingPreview(number) {
             .tool-palette {
                 display: flex;
                 gap: 4px;
-                flex-wrap: nowrap;
+                flex-wrap: wrap;
             }
 
             .palette-btn {
@@ -3318,12 +3355,24 @@ function drawingPreview(number) {
             .drawing-page:fullscreen .back, .drawing-page.is-fullscreen .back,
             .drawing-page:fullscreen .page-head, .drawing-page.is-fullscreen .page-head,
             .drawing-page:fullscreen .drawing-info, .drawing-page.is-fullscreen .drawing-info { display: none; }
-            .drawing-page:fullscreen .drawing-toolbar, .drawing-page.is-fullscreen .drawing-toolbar { max-height: none; overflow-x: auto; overflow-y: hidden; flex: 0 0 auto; }
+            .drawing-page:fullscreen .drawing-toolbar, .drawing-page.is-fullscreen .drawing-toolbar { max-height: none; overflow: visible; flex: 0 0 auto; }
             .drawing-page:fullscreen .drawing-container, .drawing-page.is-fullscreen .drawing-container { flex: 1 1 auto; min-height: 0; margin-bottom: 6px; }
             .drawing-page:fullscreen #drawingCanvas, .drawing-page.is-fullscreen #drawingCanvas { width: auto; height: 100%; max-width: 100%; object-fit: contain; }
             .drawing-page:fullscreen .model-tabs, .drawing-page.is-fullscreen .model-tabs,
             .drawing-page:fullscreen .draft-status-strip, .drawing-page.is-fullscreen .draft-status-strip { flex: 0 0 auto; }
-            @media (max-width: 700px) { .drawing-timer-panel { flex-wrap: wrap; } .drawing-timer-panel > span { flex-basis: 100%; order: 1; } .drawing-timeup-overlay, .drawing-project-content { flex-wrap: wrap; } }
+            @media (max-width: 700px) {
+                .drawing-timer-panel { flex-wrap: wrap; }
+                .drawing-timer-panel > span { flex-basis: 100%; order: 1; }
+                .drawing-timeup-overlay, .drawing-project-content { flex-wrap: wrap; }
+                .drawing-toolbar-row { align-items: stretch; }
+                .drawing-toolbar-row > .tool-group { flex: 1 1 130px; }
+                .drawing-context-tools { flex-basis: 100%; }
+                .drawing-context-tools .palette-category { flex: 1 1 120px; }
+                .drawing-toolbar .tool-palette,
+                .drawing-toolbar .palette-categories,
+                .drawing-toolbar .palette-items { flex-wrap: wrap; max-width: 100%; }
+                .drawing-toolbar .material-controls { flex-wrap: wrap; }
+            }
         </style>
     `;
 
@@ -3467,9 +3516,9 @@ function submitAssessment(number) {
     }
 
     let correctAnswers = 0;
-    for (let i = 0; i < totalQuestions; i++) {
-        const selected = selectedAnswers[i];
-        const correct = questions[i].correct;
+    const questionResults = questions.map((question, index) => {
+        const selected = selectedAnswers[index];
+        const correct = question.correct;
         const isCorrect = Array.isArray(correct)
             ? Array.isArray(selected)
                 && selected.length === correct.length
@@ -3478,7 +3527,11 @@ function submitAssessment(number) {
         if (isCorrect) {
             correctAnswers++;
         }
-    }
+        return {
+            question: question.q,
+            isCorrect
+        };
+    });
     
     const score = Math.round((correctAnswers / totalQuestions) * 100);
     const passing = score >= 70;
@@ -3546,6 +3599,19 @@ function submitAssessment(number) {
                 </p>` : ''}
 
             </div>
+
+            <section class="quiz-review" aria-label="Question-by-question quiz results">
+                <h3>QUESTION REVIEW</h3>
+                ${questionResults.map((item, index) => `
+                    <article class="question-result">
+                        <div class="question-result-heading">
+                            <strong>Question ${index + 1} of ${totalQuestions}</strong>
+                            <span class="answer-status ${item.isCorrect ? 'correct' : 'incorrect'}">${item.isCorrect ? 'CORRECT' : 'INCORRECT'}</span>
+                        </div>
+                        <p>${item.question}</p>
+                    </article>
+                `).join('')}
+            </section>
 
 
             <div style="margin-top: 20px;">
